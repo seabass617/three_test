@@ -32,8 +32,24 @@ const init = () =>  {
   // create a geometry
   const geometry = new THREE.BoxBufferGeometry( 2, 2, 2 );
 
-  // create a purple Standard material
-  const material = new THREE.MeshStandardMaterial( { color: 0x800080 } );
+  // create a texture loader.
+  const textureLoader = new THREE.TextureLoader();
+
+  // Load a texture. See the note in chapter 4 on working locally, or the page
+  // https://threejs.org/docs/#manual/introduction/How-to-run-things-locally
+  // if you run into problems here
+  const texture = textureLoader.load( 'textures/uv_test_bw.png' );
+
+  // set the "color space" of the texture
+  texture.encoding = THREE.sRGBEncoding;
+
+  // reduce blurring at glancing angles
+  texture.anisotropy = 16;
+
+  // create a Standard material using the texture we just loaded as a color map
+  const material = new THREE.MeshStandardMaterial( {
+  map: texture,
+  } );
 
   // create a Mesh containing the geometry and material
   mesh = new THREE.Mesh( geometry, material );
@@ -42,7 +58,7 @@ const init = () =>  {
   scene.add( mesh );
 
   // Create a directional light
-  const light = new THREE.DirectionalLight( 0xffffff, 5.0 );
+  const light = new THREE.DirectionalLight( 0xffffff, 3.0 );
 
   // move the light back and up a bit
   light.position.set( 10, 10, 10 );
@@ -55,6 +71,11 @@ const init = () =>  {
   renderer.setSize( container.clientWidth, container.clientHeight );
 
   renderer.setPixelRatio( window.devicePixelRatio );
+
+  // set the gamma correction so that output colors look
+  // correct on our screens
+  renderer.gammaFactor = 2.2;
+  renderer.gammaOutput = true;
 
   // add the automatically created <canvas> element to the page
   container.appendChild( renderer.domElement );
